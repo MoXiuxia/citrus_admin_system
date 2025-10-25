@@ -198,28 +198,68 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// 使用 PostgreSQL 连接
+// 使用 Supabase PostgreSQL 连接 - 增强配置
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: { 
+    rejectUnauthorized: false 
+  },
+  // 连接池优化配置
+  max: 10,                    // 最大连接数
+  idleTimeoutMillis: 30000,   // 空闲连接超时
+  connectionTimeoutMillis: 5000, // 连接超时
+  maxUses: 7500,              // 单个连接最大使用次数
+});
+
+// 添加连接池事件监听
+pool.on('connect', (client) => {
+  console.log('🔗 新的数据库连接建立');
+});
+
+pool.on('error', (err, client) => {
+  console.error('❌ 数据库连接池错误:', err);
 });
 
 // 测试连接
 const testConnection = async () => {
+  let client;
   try {
-    const client = await pool.connect();
-    console.log('✅ PostgreSQL 数据库连接成功');
-    client.release();
+    client = await pool.connect();
+    console.log('✅ Supabase 数据库连接成功');
+    
+    // 测试查询
+    const result = await client.query('SELECT NOW() as current_time');
+    console.log('✅ 数据库查询测试成功，当前时间:', result.rows[0].current_time);
+    
     return true;
   } catch (error) {
     console.error('❌ 数据库连接失败:', error.message);
     return false;
+  } finally {
+    if (client) client.release();
   }
 };
 
 // 执行查询的辅助函数
-const query = (text, params) => {
-  return pool.query(text, params);
+const query = async (text, params = []) => {
+  let client;
+  try {
+    client = await pool.connect();
+    const result = await client.query(text, params);
+    return { 
+      success: true, 
+      data: result.rows,
+      rowCount: result.rowCount
+    };
+  } catch (error) {
+    console.error('数据库查询错误:', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
+  } finally {
+    if (client) client.release();
+  }
 };
 
 module.exports = {
