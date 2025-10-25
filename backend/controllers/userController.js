@@ -1,26 +1,24 @@
-const { getPool } = require('../config/database');
+const { query } = require('../config/database');
 
-class UserController {
+const userController = {
     // 获取用户信息
     async getUserInfo(req, res) {
         try {
             const { userId } = req.params;
             
-            const pool = getPool();
-            
-            const [users] = await pool.promise().query(
-                'SELECT id, username, created_at FROM users WHERE id = ?',
+            const result = await query(
+                'SELECT id, username, created_at FROM users WHERE id = $1',
                 [userId]
             );
             
-            if (users.length === 0) {
+            if (!result.success || result.data.length === 0) {
                 return res.status(404).json({
                     success: false,
                     error: '用户不存在'
                 });
             }
             
-            const user = users[0];
+            const user = result.data[0];
             
             res.json({
                 success: true,
@@ -40,7 +38,7 @@ class UserController {
                 error: '获取用户信息失败'
             });
         }
-    }
+    },
 
     // 获取用户提交记录
     async getUserSubmissions(req, res) {
@@ -50,10 +48,8 @@ class UserController {
             
             const offset = (page - 1) * limit;
             
-            const pool = getPool();
-            
-            // 查询用户提交记录
-            const [submissions] = await pool.promise().query(
+            // 查询用户提交记录 - 改为 PostgreSQL 语法
+            const submissionsResult = await query(
                 `SELECT 
                     cs.id,
                     cs.image_url,
@@ -64,25 +60,25 @@ class UserController {
                     cs.submitted_at,
                     cs.reviewed_at
                 FROM citrus_submissions cs
-                WHERE cs.user_id = ?
+                WHERE cs.user_id = $1
                 ORDER BY cs.submitted_at DESC
-                LIMIT ? OFFSET ?`,
+                LIMIT $2 OFFSET $3`,
                 [userId, parseInt(limit), offset]
             );
             
             // 查询总数
-            const [countResult] = await pool.promise().query(
-                'SELECT COUNT(*) as total FROM citrus_submissions WHERE user_id = ?',
+            const countResult = await query(
+                'SELECT COUNT(*) as total FROM citrus_submissions WHERE user_id = $1',
                 [userId]
             );
             
-            const total = countResult[0].total;
+            const total = parseInt(countResult.data[0].total);
             const totalPages = Math.ceil(total / limit);
             
             res.json({
                 success: true,
                 data: {
-                    submissions,
+                    submissions: submissionsResult.data,
                     pagination: {
                         page: parseInt(page),
                         limit: parseInt(limit),
@@ -99,7 +95,7 @@ class UserController {
                 error: '获取提交记录失败'
             });
         }
-    }
+    },
 
     // 更新用户信息
     async updateUserInfo(req, res) {
@@ -107,42 +103,42 @@ class UserController {
             const { userId } = req.params;
             const { username, currentPassword, newPassword } = req.body;
             
-            const pool = getPool();
-            
             // 验证当前用户
-            const [users] = await pool.promise().query(
-                'SELECT * FROM users WHERE id = ?',
+            const userResult = await query(
+                'SELECT * FROM users WHERE id = $1',
                 [userId]
             );
             
-            if (users.length === 0) {
+            if (userResult.data.length === 0) {
                 return res.status(404).json({
                     success: false,
                     error: '用户不存在'
                 });
             }
             
-            const user = users[0];
+            const user = userResult.data[0];
             const updates = [];
             const params = [];
+            let paramCount = 1;
             
             // 更新用户名
             if (username && username !== user.username) {
                 // 检查用户名是否已存在
-                const [existingUsers] = await pool.promise().query(
-                    'SELECT id FROM users WHERE username = ? AND id != ?',
+                const existingResult = await query(
+                    'SELECT id FROM users WHERE username = $1 AND id != $2',
                     [username, userId]
                 );
                 
-                if (existingUsers.length > 0) {
+                if (existingResult.data.length > 0) {
                     return res.status(400).json({
                         success: false,
                         error: '用户名已存在'
                     });
                 }
                 
-                updates.push('username = ?');
+                updates.push(`username = $${paramCount}`);
                 params.push(username);
+                paramCount++;
             }
             
             // 更新密码
@@ -172,8 +168,9 @@ class UserController {
                 }
                 
                 const hashedPassword = await bcrypt.hash(newPassword, 10);
-                updates.push('password = ?');
+                updates.push(`password = $${paramCount}`);
                 params.push(hashedPassword);
+                paramCount++;
             }
             
             if (updates.length === 0) {
@@ -185,8 +182,8 @@ class UserController {
             
             params.push(userId);
             
-            await pool.promise().query(
-                `UPDATE users SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+            await query(
+                `UPDATE users SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramCount}`,
                 params
             );
             
@@ -202,31 +199,29 @@ class UserController {
                 error: '更新用户信息失败'
             });
         }
-    }
+    },
 
     // 删除用户（管理员功能）
     async deleteUser(req, res) {
         try {
             const { userId } = req.params;
             
-            const pool = getPool();
-            
             // 检查用户是否存在
-            const [users] = await pool.promise().query(
-                'SELECT id FROM users WHERE id = ?',
+            const userResult = await query(
+                'SELECT id FROM users WHERE id = $1',
                 [userId]
             );
             
-            if (users.length === 0) {
+            if (userResult.data.length === 0) {
                 return res.status(404).json({
                     success: false,
                     error: '用户不存在'
                 });
             }
             
-            // 删除用户（外键约束会自动删除相关的提交记录）
-            await pool.promise().query(
-                'DELETE FROM users WHERE id = ?',
+            // 删除用户
+            await query(
+                'DELETE FROM users WHERE id = $1',
                 [userId]
             );
             
@@ -242,7 +237,7 @@ class UserController {
                 error: '删除用户失败'
             });
         }
-    }
+    },
 
     // 获取所有用户列表（管理员功能）
     async getAllUsers(req, res) {
@@ -251,18 +246,18 @@ class UserController {
             
             const offset = (page - 1) * limit;
             
-            const pool = getPool();
-            
             let whereClause = '';
             let queryParams = [];
+            let paramCount = 1;
             
             if (search) {
-                whereClause = 'WHERE username LIKE ?';
+                whereClause = `WHERE username LIKE $${paramCount}`;
                 queryParams.push(`%${search}%`);
+                paramCount++;
             }
             
             // 查询用户列表
-            const [users] = await pool.promise().query(
+            const usersResult = await query(
                 `SELECT 
                     id,
                     username,
@@ -271,23 +266,23 @@ class UserController {
                 FROM users 
                 ${whereClause}
                 ORDER BY created_at DESC
-                LIMIT ? OFFSET ?`,
+                LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
                 [...queryParams, parseInt(limit), offset]
             );
             
             // 查询总数
-            const [countResult] = await pool.promise().query(
+            const countResult = await query(
                 `SELECT COUNT(*) as total FROM users ${whereClause}`,
                 queryParams
             );
             
-            const total = countResult[0].total;
+            const total = parseInt(countResult.data[0].total);
             const totalPages = Math.ceil(total / limit);
             
             res.json({
                 success: true,
                 data: {
-                    users,
+                    users: usersResult.data,
                     pagination: {
                         page: parseInt(page),
                         limit: parseInt(limit),
@@ -306,6 +301,6 @@ class UserController {
             });
         }
     }
-}
+};
 
-module.exports = new UserController();
+module.exports = userController;

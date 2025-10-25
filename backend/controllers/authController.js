@@ -222,8 +222,8 @@ const authController = {
                 });
             }
 
-            // 检查用户是否已存在
-            const checkResult = await query('SELECT id FROM users WHERE username = ?', [username]);
+            // 检查用户是否已存在 - 改为 PostgreSQL 语法
+            const checkResult = await query('SELECT id FROM users WHERE username = $1', [username]);
             if (checkResult.success && checkResult.data.length > 0) {
                 return res.status(400).json({
                     success: false,
@@ -234,9 +234,9 @@ const authController = {
             // 加密密码
             const hashedPassword = await bcrypt.hash(password, 10);
             
-            // 创建用户
+            // 创建用户 - 改为 PostgreSQL 语法
             const insertResult = await query(
-                'INSERT INTO users (username, password) VALUES (?, ?)',
+                'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
                 [username, hashedPassword]
             );
 
@@ -244,7 +244,9 @@ const authController = {
                 res.json({
                     success: true,
                     message: '注册成功',
-                    data: { userId: insertResult.data.insertId }
+                    data: { 
+                        userId: insertResult.data[0].id  // PostgreSQL 返回的是数组
+                    }
                 });
             } else {
                 res.status(500).json({
@@ -273,9 +275,9 @@ const authController = {
                 });
             }
 
-            // 查找用户
+            // 查找用户 - 改为 PostgreSQL 语法
             const result = await query(
-                'SELECT id, username, password FROM users WHERE username = ?',
+                'SELECT id, username, password FROM users WHERE username = $1',
                 [username]
             );
 
@@ -317,50 +319,46 @@ const authController = {
     // 管理员登录
     adminLogin: async (req, res) => {
         try {
-                const { username, password } = req.body;
-                if (!username || !password) {
-                    return res.status(400).json({
-                        success: false,
-                        error: '管理员账号和密码不能为空'
-                    });
-                }
-    
-                // 查找管理员
-                const result = await query(
-                    'SELECT id, username, password FROM admins WHERE username = ?',
-                    [username]
-                );
-    
-                if (!result.success || result.data.length === 0) {
-                    return res.status(401).json({
-                        success: false,
-                        error: '管理员账号或密码错误'
-                    });
-                }
-    
-                const admin = result.data[0];
-            
-                // 验证密码（明文比较，因为数据库中是明文存储）
-                if (password !== admin.password) {
-                    return res.status(401).json({
-                        success: false,
-                        error: '管理员账号或密码错误'
-                    });
-                }
-    
-                // 移除密码字段
-                const { password: _, ...adminWithoutPassword } = admin;
-            
-            
-                // 简单验证（实际应该从数据库验证）
-            
-                res.json({
-                    success: true,
-                    message: '管理员登录成功',
-                    data: { admin: adminWithoutPassword }
+            const { username, password } = req.body;
+            if (!username || !password) {
+                return res.status(400).json({
+                    success: false,
+                    error: '管理员账号和密码不能为空'
                 });
-            
-            
+            }
+
+            // 查找管理员 - 改为 PostgreSQL 语法
+            const result = await query(
+                'SELECT id, username, password FROM admins WHERE username = $1',
+                [username]
+            );
+
+            if (!result.success || result.data.length === 0) {
+                return res.status(401).json({
+                    success: false,
+                    error: '管理员账号或密码错误'
+                });
+            }
+
+            const admin = result.data[0];
+        
+            // 验证密码（明文比较，因为数据库中是明文存储）
+            if (password !== admin.password) {
+                return res.status(401).json({
+                    success: false,
+                    error: '管理员账号或密码错误'
+                });
+            }
+
+            // 移除密码字段
+            const { password: _, ...adminWithoutPassword } = admin;
+        
+            res.json({
+                success: true,
+                message: '管理员登录成功',
+                data: { admin: adminWithoutPassword }
+            });
+        
         } catch (error) {
             console.error('管理员登录错误:', error);
             res.status(500).json({
