@@ -1,0 +1,52 @@
+{
+    "name": "citrus-admin-system",
+    "version": "1.0.0",
+    "description": "陈皮信息管理系统 - 前后端分离项目",
+    "main": "index.js",
+    "scripts": {
+      "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+      "dev:backend": "cd backend && npm run dev",
+      "dev:frontend": "cd frontend && npm run dev",
+      "start": "cd backend && npm start",
+      "start:docker": "docker-compose up -d",
+      "stop:docker": "docker-compose down",
+      "build": "npm run build:frontend",
+      "build:frontend": "cd frontend && npm run build",
+      "build:docker": "docker-compose build",
+      "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+      "clean": "npm run clean:modules && npm run clean:build",
+      "clean:modules": "rm -rf node_modules backend/node_modules frontend/node_modules",
+      "clean:build": "rm -rf frontend/dist backend/public/*",
+      "db:init": "cd backend && node scripts/initDB.js",
+      "test": "echo \"No tests specified\" && exit 0",
+      "lint": "eslint backend/ frontend/src/",
+      "lint:fix": "eslint backend/ frontend/src/ --fix"
+    },
+    "keywords": [
+      "citrus",
+      "admin",
+      "management",
+      "vue",
+      "express",
+      "mysql"
+    ],
+    "author": "Your Name <your.email@example.com>",
+    "license": "MIT",
+    "devDependencies": {
+      "concurrently": "^7.6.0",
+      "eslint": "^8.45.0",
+      "nodemon": "^3.0.1"
+    },
+    "engines": {
+      "node": ">=18.0.0",
+      "npm": ">=8.0.0"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/yourusername/citrus-admin-system.git"
+    },
+    "bugs": {
+      "url": "https://github.com/yourusername/citrus-admin-system/issues"
+    },
+    "homepage": "https://github.com/yourusername/citrus-admin-system#readme"
+  }

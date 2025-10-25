@@ -1,0 +1,31 @@
+{
+  "name": "citrus-admin-backend",
+  "version": "1.0.0",
+  "description": "陈皮管理系统后端",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "bcryptjs": "^2.4.3",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "sharp": "^0.32.6",
+    "axios": "^1.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "citrus",
+    "admin",
+    "management"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

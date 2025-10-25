@@ -1,0 +1,342 @@
+/* 陈皮主题色彩系统 */
+:root {
+  /* 主色调 - 陈皮色系 */
+  --citrus-primary: #FFA726;      /* 陈皮橙 */
+  --citrus-secondary: #8D6E63;    /* 陈皮棕 */
+  --citrus-accent: #FFB74D;       /* 浅陈皮橙 */
+  --citrus-light: #FFF3E0;        /* 浅米色背景 */
+  --citrus-dark: #5D4037;         /* 深棕色 */
+  --citrus-success: #689F38;      /* 成功绿 */
+  --citrus-warning: #FF9800;      /* 警告橙 */
+  --citrus-error: #E53935;        /* 错误红 */
+  
+  /* 中性色 */
+  --citrus-white: #FFFFFF;
+  --citrus-gray-100: #F5F5F5;
+  --citrus-gray-200: #EEEEEE;
+  --citrus-gray-300: #E0E0E0;
+  --citrus-gray-400: #BDBDBD;
+  --citrus-gray-500: #9E9E9E;
+  --citrus-gray-600: #757575;
+  --citrus-gray-700: #616161;
+  --citrus-gray-800: #424242;
+  --citrus-gray-900: #212121;
+}
+
+/* 基础重置和字体 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--citrus-light) 0%, #FFECB3 100%);
+  min-height: 100vh;
+  color: var(--citrus-dark);
+  line-height: 1.6;
+}
+
+/* 容器样式 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* 卡片样式 */
+.citrus-card {
+  background: var(--citrus-white);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(141, 110, 99, 0.1);
+  border: 1px solid var(--citrus-gray-200);
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.citrus-card:hover {
+  box-shadow: 0 8px 30px rgba(141, 110, 99, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--citrus-primary) 0%, var(--citrus-accent) 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--citrus-accent) 0%, var(--citrus-primary) 100%);
+  box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--citrus-success) 0%, #8BC34A 100%);
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #8BC34A 0%, var(--citrus-success) 100%);
+  box-shadow: 0 4px 15px rgba(104, 159, 56, 0.3);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--citrus-error) 0%, #EF5350 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #EF5350 0%, var(--citrus-error) 100%);
+  box-shadow: 0 4px 15px rgba(229, 57, 53, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--citrus-primary);
+  color: var(--citrus-primary);
+}
+
+.btn-outline:hover {
+  background: var(--citrus-primary);
+  color: white;
+}
+
+/* 表格样式 */
+.citrus-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.citrus-table th {
+  background: linear-gradient(135deg, var(--citrus-secondary) 0%, var(--citrus-dark) 100%);
+  color: white;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.citrus-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--citrus-gray-200);
+  font-size: 14px;
+}
+
+.citrus-table tr:last-child td {
+  border-bottom: none;
+}
+
+.citrus-table tr:hover {
+  background-color: var(--citrus-light);
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--citrus-dark);
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--citrus-gray-300);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--citrus-primary);
+  box-shadow: 0 0 0 3px rgba(255, 167, 38, 0.1);
+}
+
+/* 状态标签 */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: #FFF3E0;
+  color: var(--citrus-warning);
+  border: 1px solid #FFE0B2;
+}
+
+.status-approved {
+  background: #E8F5E8;
+  color: var(--citrus-success);
+  border: 1px solid #C8E6C9;
+}
+
+.status-rejected {
+  background: #FFEBEE;
+  color: var(--citrus-error);
+  border: 1px solid #FFCDD2;
+}
+
+/* 标签页样式 */
+.citrus-tabs {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--citrus-gray-600);
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.tab-btn.active {
+  background: var(--citrus-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.3);
+}
+
+.tab-btn:hover:not(.active) {
+  background: var(--citrus-light);
+  color: var(--citrus-primary);
+}
+
+/* 头部样式 */
+.citrus-header {
+  background: linear-gradient(135deg, var(--citrus-secondary) 0%, var(--citrus-dark) 100%);
+  color: white;
+  padding: 20px 0;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+}
+
+.header-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* 图片样式 */
+.submission-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--citrus-gray-200);
+  transition: all 0.3s ease;
+}
+
+.submission-image:hover {
+  transform: scale(1.1);
+  border-color: var(--citrus-primary);
+}
+
+/* 空状态样式 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--citrus-gray-500);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.empty-state-subtext {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .citrus-tabs {
+    flex-direction: column;
+  }
+  
+  .tab-btn {
+    margin-bottom: 8px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .citrus-table {
+    font-size: 12px;
+  }
+  
+  .citrus-table th,
+  .citrus-table td {
+    padding: 12px 8px;
+  }
+}

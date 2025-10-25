@@ -1,0 +1,28 @@
+{
+    "name": "citrus-admin-frontend",
+    "version": "1.0.0",
+    "description": "陈皮管理系统前端",
+    "main": "src/main.js",
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "dev": "vite",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.4",
+        "vuex": "^4.0.2"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.2.3",
+        "vite": "^4.4.5"
+    },
+    "keywords": [
+        "vue",
+        "citrus",
+        "admin"
+    ],
+    "author": "Your Name",
+    "license": "MIT"
+}
